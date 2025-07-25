@@ -2,9 +2,9 @@ name: Deploy to Environments
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature-test]
   pull_request:
-    branches: [main]
+    branches: [main, feature-test]
 
 jobs:
   deploy-staging:
