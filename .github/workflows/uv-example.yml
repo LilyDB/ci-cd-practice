@@ -1,0 +1,17 @@
+name: Using UV
+
+on: [push]
+
+jobs:
+  test-with-uv:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    - name: Set up Python
+      run: uv python install 3.11
+    - name: Install dependencies
+      run: uv pip install --system pytest
+    - name: Run tests
+      run: python test_calculator.py

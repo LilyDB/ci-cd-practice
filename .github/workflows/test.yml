@@ -1,0 +1,20 @@
+name: Test and Build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Run basic hello
+      run: python hello.py
+    - name: Run calculator tests
+      run: python test_calculator.py
+    - name: Run calculator app
+      run: python calculator.py
+    - name: Success
+      run: echo "✅ All tests and builds completed!"
