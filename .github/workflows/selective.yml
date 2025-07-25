@@ -1,0 +1,22 @@
+name: Selective CI
+
+on:
+  push:
+    paths:
+      - 'src/**'           # Only run if files in src/ change
+      - 'tests/**'         # Only run if files in tests/ change
+      - '*.py'             # Only run if .py files in root change
+      - 'requirements.txt' # Only run if requirements change
+
+jobs:
+  test-changed-code:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Run tests only for changed files
+      run: |
+        echo "Running CI only because relevant files changed"
+        python test_calculator.py

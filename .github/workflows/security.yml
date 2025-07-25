@@ -20,7 +20,7 @@ jobs:
     - name: Run code quality check
       run: flake8 --max-line-length=88 *.py || true
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: "*-report.json"
