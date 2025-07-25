@@ -1,0 +1,51 @@
+name: Deploy to Environments
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    environment: staging
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Deploy to Staging
+      run: |
+        echo "🚀 Deploying to STAGING environment"
+        echo "STAGING_URL=https://staging.myapp.com" >> $GITHUB_ENV
+        python app.py &
+        sleep 2
+        curl -f http://localhost:8001/health
+        pkill -f "python app.py"
+        echo "✅ Staging deployment successful"
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    needs: []
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Run Production Tests
+      run: |
+        pip install pytest
+        pytest test_calculator.py -v
+    - name: Deploy to Production
+      run: |
+        echo "🚀 Deploying to PRODUCTION environment"
+        echo "PROD_URL=https://myapp.com" >> $GITHUB_ENV
+        python app.py &
+        sleep 2
+        curl -f http://localhost:8001/health
+        pkill -f "python app.py"
+        echo "✅ Production deployment successful"
