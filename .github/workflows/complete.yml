@@ -1,0 +1,46 @@
+name: Complete CI/CD
+
+on:
+  push:
+    paths:
+      - '*.py'
+      - 'requirements.txt'
+      - '.github/workflows/**'
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install bandit safety flake8 pytest
+    
+    - name: Run pytest calculator tests
+      run: pytest test_calculator.py -v
+    
+    - name: Run security scan
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+        safety check --json --output safety-report.json || true
+        flake8 --max-line-length=88 *.py || true
+    
+    - name: Test web app
+      run: |
+        python app.py &
+        sleep 3
+        curl -f http://localhost:8001/health || exit 1
+        pkill -f "python app.py"
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: "*-report.json"
+    
+    - name: All tasks completed
+      run: echo "✅ Tests, security scan, and app check completed!"
