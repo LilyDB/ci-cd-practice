@@ -25,7 +25,7 @@ resource "null_resource" "example" {
   triggers = {
     timestamp = timestamp()
   }
-  
+
   provisioner "local-exec" {
     command = "echo 'Terraform deployment completed at ${timestamp()}'"
   }
