@@ -23,12 +23,6 @@ jobs:
     - name: Run pytest calculator tests
       run: pytest test_calculator.py -v
     
-    - name: Run security scan
-      run: |
-        bandit -r . -f json -o bandit-report.json || true
-        safety check --json --output safety-report.json || true
-        flake8 --max-line-length=88 *.py || true
-    
     - name: Test web app
       run: |
         python app.py &

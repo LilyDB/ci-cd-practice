@@ -1,6 +1,11 @@
 name: Security and Quality
 
-on: [push]
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  push:
+    paths:
+      - 'requirements.txt'  # Also run when dependencies change
 
 jobs:
   security-scan:
