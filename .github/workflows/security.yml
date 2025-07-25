@@ -2,7 +2,7 @@ name: Security and Quality
 
 on:
   schedule:
-    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+    - cron: '0 8 * * 1'  # Every Monday at 2 AM UTC
   push:
     paths:
       - 'requirements.txt'  # Also run when dependencies change
