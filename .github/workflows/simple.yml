@@ -12,8 +12,6 @@ jobs:
       with:
         python-version: '3.11'
     - name: Run hello script
-      run: |
-        cd ci-cd-practice
-        python hello.py
+      run: python hello.py
     - name: Success
       run: echo "✅ Pipeline completed!"
