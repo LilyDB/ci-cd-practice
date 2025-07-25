@@ -3,46 +3,53 @@ name: Deploy to Environments
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+
+env:
+  STAGING_URL: "https://staging-app.herokuapp.com"
+  PROD_URL: "https://prod-app.herokuapp.com"
 
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    environment: staging
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    - name: Deploy to Staging
+    - name: Deploy to Staging Environment
       run: |
         echo "🚀 Deploying to STAGING environment"
-        echo "STAGING_URL=https://staging.myapp.com" >> $GITHUB_ENV
+        echo "Environment: staging"
+        echo "Staging URL: $STAGING_URL"
+        echo "ENVIRONMENT=staging" >> $GITHUB_ENV
         python app.py &
         sleep 2
         curl -f http://localhost:8001/health
         pkill -f "python app.py"
-        echo "✅ Staging deployment successful"
+        echo "✅ Staging deployment completed"
 
   deploy-production:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production  
+    needs: deploy-staging
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    - name: Run Production Tests
+    - name: Production Pre-deployment Tests
       run: |
         pip install pytest
         pytest test_calculator.py -v
-    - name: Deploy to Production
+    - name: Deploy to Production Environment
       run: |
         echo "🚀 Deploying to PRODUCTION environment"
-        echo "PROD_URL=https://myapp.com" >> $GITHUB_ENV
+        echo "Environment: production"
+        echo "Production URL: $PROD_URL"
+        echo "ENVIRONMENT=production" >> $GITHUB_ENV
         python app.py &
         sleep 2
         curl -f http://localhost:8001/health
         pkill -f "python app.py"
-        echo "✅ Production deployment successful"
+        echo "✅ Production deployment completed"
