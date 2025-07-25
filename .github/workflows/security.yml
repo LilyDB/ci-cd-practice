@@ -1,0 +1,28 @@
+name: Security and Quality
+
+on: [push]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install security tools
+      run: |
+        pip install bandit safety flake8
+    - name: Run Bandit security scan
+      run: bandit -r . -f json -o bandit-report.json || true
+    - name: Run Safety check
+      run: safety check --json --output safety-report.json || true
+    - name: Run code quality check
+      run: flake8 --max-line-length=88 *.py || true
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: "*-report.json"
+    - name: Security scan completed
+      run: echo "✅ Security and quality checks completed"

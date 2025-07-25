@@ -1,0 +1,2 @@
+# Basic requirements for testing security scanning
+requests==2.31.0
