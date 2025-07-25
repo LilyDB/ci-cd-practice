@@ -1,0 +1,19 @@
+name: Simple Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Run hello script
+      run: |
+        cd ci-cd-practice
+        python hello.py
+    - name: Success
+      run: echo "✅ Pipeline completed!"
