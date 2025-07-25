@@ -1,0 +1,48 @@
+name: Build and Deploy Docker
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t ci-cd-practice-app:latest .
+        docker build -t ci-cd-practice-app:$GITHUB_SHA .
+    
+    - name: Test Docker container
+      run: |
+        docker run -d -p 8001:8001 --name test-container ci-cd-practice-app:latest
+        sleep 5
+        curl -f http://localhost:8001/health
+        docker stop test-container
+        docker rm test-container
+    
+    - name: Push to Docker Hub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        if [ ! -z "$DOCKER_USERNAME" ] && [ ! -z "$DOCKER_PASSWORD" ]; then
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push ci-cd-practice-app:latest
+          docker push ci-cd-practice-app:$GITHUB_SHA
+          echo "✅ Docker images pushed to Docker Hub"
+        else
+          echo "⚠️ Docker Hub credentials not set, skipping push"
+        fi
+    
+    - name: Save Docker image as artifact
+      run: |
+        docker save ci-cd-practice-app:latest | gzip > ci-cd-practice-app.tar.gz
+    
+    - name: Upload Docker image
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: ci-cd-practice-app.tar.gz
